@@ -1,18 +1,14 @@
+using AbySalto.Junior.Models.Enums;
+
 namespace AbySalto.Junior.Models
 {
-    public enum OrderStatus
-    {
-        Pending,        // Na čekanju
-        InPreparation,  // U pripremi
-        Completed       // Završena
-    }
-
     public class Order
     {
         public int Id { get; set; }
         public string CustomerName { get; set; } =  string.Empty;
         public OrderStatus Status { get; set; } = OrderStatus.Pending;
         public DateTime OrderTime { get; set; } = DateTime.UtcNow;
+        public PaymentMethod PaymentMethod { get; set; } = PaymentMethod.Cash;
         public string? DeliveryAddress { get; set; }
         public string? ContactNumber { get; set; }
         public string? Note { get; set; }
