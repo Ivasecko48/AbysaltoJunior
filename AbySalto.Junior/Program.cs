@@ -1,5 +1,6 @@
 
 using AbySalto.Junior.Infrastructure.Database;
+using AbySalto.Junior.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -20,8 +21,12 @@ namespace AbySalto.Junior
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Restaurant", Version = "v1" });
             });
 
+            //  Database
             builder.Services.AddDbContext<IApplicationDbContext, ApplicationDbContext>(options =>
                 options.UseSqlite("Data Source=restaurant.db"));
+
+            // Dependency injection
+            builder.Services.AddScoped<IOrderService, OrderService>();
 
             var app = builder.Build();
 

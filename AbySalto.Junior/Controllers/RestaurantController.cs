@@ -1,5 +1,6 @@
 ﻿using AbySalto.Junior.DTOs;
 using AbySalto.Junior.Models;
+using AbySalto.Junior.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AbySalto.Junior.Controllers
@@ -8,39 +9,48 @@ namespace AbySalto.Junior.Controllers
     [ApiController]
     public class RestaurantController : Controller
     {
-        [HttpGet("orders")]
-        public IEnumerable<Order> GetAllOrders()
+        private readonly IOrderService _orderService;
+
+        public RestaurantController(IOrderService orderService)
         {
-            // TO DO: dohvati sve narudžbe iz baze
-            return Enumerable.Empty<Order>();
+            _orderService = orderService;
+        }
+        
+        [HttpGet("orders")]
+        public async Task<IEnumerable<Order>> GetAllOrders()
+        {
+            return await _orderService.GetAllOrders();
         }
 
         [HttpGet("orders/{id}")]
-        public Order GetOrderById([FromRoute] int id)
+        public async Task<Order?> GetOrderById(int id)
         {
-            // dohvati narudžbu po id-u
-            return new Order();
+            return await _orderService.GetOrderById(id);
         }
 
         [HttpPost("new")]
-        public int CreateOrder([FromBody] CreateOrderDTO newOrder)
+        public async Task<int> CreateOrder([FromBody] CreateOrderDTO newOrder)
         {
-            // spremi novu narudžbu 
-            return 0;
+            var created = await _orderService.CreateOrder(newOrder);
+            return created.Id;
         }
 
         [HttpPatch("orders/{id}/status")]
-        public int UpdateOrderStatus([FromRoute] int id, [FromBody] UpdateOrderStatusDTO dto)
+        public async Task<bool> UpdateOrderStatus(int id, [FromBody] UpdateOrderStatusDTO dto)
         {
-            // promijeni status
-            return 0;
+            return await _orderService.UpdateOrderStatus(id, dto);
         }
 
         [HttpGet("orders/{id}/total")]
-        public decimal GetOrderTotal([FromRoute] int id)
+        public async Task<decimal> GetOrderTotal(int id)
         {
-            // izračunaj ukupni iznos 
-            return 0;
+            return await _orderService.GetOrderTotal(id);
+        }
+
+        [HttpGet("orders/sorted")]
+        public async Task<IEnumerable<Order>> GetAllOrdersSortedByTotal()
+        {
+            return await _orderService.GetAllOrders(sortByTotal: true);
         }
     }
 }
