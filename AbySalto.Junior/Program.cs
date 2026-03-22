@@ -21,7 +21,7 @@ namespace AbySalto.Junior
             });
 
             builder.Services.AddDbContext<IApplicationDbContext, ApplicationDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlite("Data Source=restaurant.db"));
 
             var app = builder.Build();
 
