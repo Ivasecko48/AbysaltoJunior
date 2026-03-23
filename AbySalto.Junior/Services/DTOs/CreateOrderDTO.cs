@@ -1,7 +1,7 @@
 using AbySalto.Junior.Models;
 using AbySalto.Junior.Models.Enums;
 
-namespace AbySalto.Junior.DTOs
+namespace AbySalto.Junior.Services.DTOs
 {
     public class CreateOrderDTO
     {
@@ -11,7 +11,7 @@ namespace AbySalto.Junior.DTOs
         public string? Note { get; set; }
         public string Currency { get; set; } = "EUR";
         public PaymentMethod PaymentMethod { get; set; }
-        public List<OrderItem> Items { get; set; } = new();
+        public List<CreateOrderItemDTO> Items { get; set; } = new();
 
         public Order ToModel()
         {
@@ -23,7 +23,12 @@ namespace AbySalto.Junior.DTOs
                 Note = Note,
                 Currency = Currency,
                 PaymentMethod = PaymentMethod,
-                Items = Items
+                Items = Items.Select(i => new OrderItem
+                {
+                    Name = i.Name,
+                    Quantity = i.Quantity,
+                    Price = i.Price
+                }).ToList()
             };
         }
     }

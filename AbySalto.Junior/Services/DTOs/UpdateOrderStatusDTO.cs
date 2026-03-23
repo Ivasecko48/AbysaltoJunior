@@ -1,6 +1,6 @@
 using AbySalto.Junior.Models.Enums;
 
-namespace AbySalto.Junior.DTOs
+namespace AbySalto.Junior.Services.DTOs
 {
     public class UpdateOrderStatusDTO
     {

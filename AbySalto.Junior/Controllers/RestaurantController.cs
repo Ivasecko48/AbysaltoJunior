@@ -1,4 +1,4 @@
-﻿using AbySalto.Junior.DTOs;
+﻿using AbySalto.Junior.Services.DTOs;
 using AbySalto.Junior.Models;
 using AbySalto.Junior.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -35,7 +35,7 @@ namespace AbySalto.Junior.Controllers
             return created.Id;
         }
 
-        [HttpPatch("orders/{id}/status")]
+        [HttpPut("orders/{id}/status")]
         public async Task<bool> UpdateOrderStatus(int id, [FromBody] UpdateOrderStatusDTO dto)
         {
             return await _orderService.UpdateOrderStatus(id, dto);

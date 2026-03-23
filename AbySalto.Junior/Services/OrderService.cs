@@ -1,4 +1,4 @@
-using AbySalto.Junior.DTOs;
+using AbySalto.Junior.Services.DTOs;
 using AbySalto.Junior.Infrastructure.Database;
 using AbySalto.Junior.Models;
 using Microsoft.EntityFrameworkCore;

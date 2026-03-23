@@ -16,7 +16,7 @@ namespace AbySalto.Junior.Models
         public decimal TotalAmount => Items.Sum(i => i.Price * i.Quantity);
 
         #region Reverse Navigation Properties
-        public List<OrderItem> Items { get; set; } = new();
+        public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
         #endregion
     }
 }

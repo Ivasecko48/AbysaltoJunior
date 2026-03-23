@@ -1,4 +1,4 @@
-using AbySalto.Junior.DTOs;
+using AbySalto.Junior.Services.DTOs;
 using AbySalto.Junior.Models;
 
 namespace AbySalto.Junior.Services
