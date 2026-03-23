@@ -14,6 +14,7 @@ REST API za upravljanje narudžbama restorana izgrađen s ASP.NET Core 9 i Entit
 
 ### Preduvjeti
 
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - [.NET 9 SDK](https://dotnet.microsoft.com/download)
 
 ### Koraci
@@ -29,12 +30,21 @@ cd AbysaltoJunior/junior.net/AbySalto.Junior
 dotnet ef database update
 ```
 
-3. Pokreni aplikaciju:
+3. Pokreni Redis container:
+```bash
+docker run -d -p 6379:6379 --name redis-restaurant redis
+
+```
+> **Caching:** Aplikacija koristi Redis distributed cache za keširanje narudžbi (30 sekundi).
+> Redis se pokreće lokalno putem Dockera.
+
+
+4. Pokreni aplikaciju:
 ```bash
 dotnet run
 ```
 
-4. Otvori Swagger UI u browseru:
+5. Otvori Swagger UI u browseru:
 ```
 http://localhost:5074
 ```
