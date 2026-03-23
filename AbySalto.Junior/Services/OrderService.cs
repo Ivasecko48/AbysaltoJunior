@@ -3,12 +3,27 @@ using AbySalto.Junior.Services.Common;
 using AbySalto.Junior.Infrastructure.Database;
 using AbySalto.Junior.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
+using System.Text.Json;
 
 namespace AbySalto.Junior.Services
 {
     public class OrderService : IOrderService
     {
         private readonly IApplicationDbContext _context;
+        private readonly IDistributedCache _cache;
+        
+        private const string AllOrdersCacheKey = "all_orders";
+        private static readonly DistributedCacheEntryOptions CacheOptions = new()
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30)
+        };
+
+        public OrderService(IApplicationDbContext context, IDistributedCache cache)
+        {
+            _context = context;
+            _cache = cache;
+        }
 
         private ValidationResult ValidateOrder(Order order)
         {
@@ -39,16 +54,24 @@ namespace AbySalto.Junior.Services
             return result;
         }
 
-        public OrderService(IApplicationDbContext context)
-        {
-            _context = context;
-        }
-
         public async Task<Result<IEnumerable<Order>>> GetAllOrders(bool sortByTotal = false)
         {
-            var orders = await _context.Orders
-                .Include(o => o.Items)
-                .ToListAsync();
+            var cached = await _cache.GetStringAsync(AllOrdersCacheKey);
+
+             List<Order> orders;
+            if (cached is not null)
+            {
+                orders = JsonSerializer.Deserialize<List<Order>>(cached)!;
+            }
+            else
+            {
+                orders = await _context.Orders
+                    .Include(o => o.Items)
+                    .ToListAsync();
+
+                await _cache.SetStringAsync(AllOrdersCacheKey,
+                    JsonSerializer.Serialize(orders), CacheOptions);
+            }
 
             if (sortByTotal)
                 return Result<IEnumerable<Order>>.Success(orders.OrderByDescending(o => o.TotalAmount));
@@ -58,14 +81,28 @@ namespace AbySalto.Junior.Services
 
         public async Task<Result<Order>> GetOrderById(int id)
         {
-            var order = await _context.Orders
-                .Include(o => o.Items)
-                .FirstOrDefaultAsync(o => o.Id == id);
+            var cacheKey = $"order_{id}";
+            var cached = await _cache.GetStringAsync(cacheKey);
+            
+             Order? order;
+            if (cached is not null)
+            {
+                order = JsonSerializer.Deserialize<Order>(cached)!;
+            }
+            else
+            {
+                order = await _context.Orders
+                    .Include(o => o.Items)
+                    .FirstOrDefaultAsync(o => o.Id == id);
 
             if (order is null)
                 return Result<Order>.Failure(new List<string> { $"Order with id {id} not found." });
 
-            return Result<Order>.Success(order);
+            await _cache.SetStringAsync(cacheKey,
+                    JsonSerializer.Serialize(order), CacheOptions);
+            }
+
+            return Result<Order>.Success(order!);
         }
 
         public async Task<Result<Order>> CreateOrder(CreateOrderDTO dto)

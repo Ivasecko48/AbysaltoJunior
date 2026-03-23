@@ -31,7 +31,11 @@ namespace AbySalto.Junior
             builder.Services.AddDbContext<IApplicationDbContext, ApplicationDbContext>(options =>
                 options.UseSqlite("Data Source=restaurant.db"));
 
-            // Dependency injection
+            // Dependency Injection
+            builder.Services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = "localhost:6379";
+            });
             builder.Services.AddScoped<IOrderService, OrderService>();
 
             var app = builder.Build();
