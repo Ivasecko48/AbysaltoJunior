@@ -10,6 +10,35 @@ namespace AbySalto.Junior.Services
     {
         private readonly IApplicationDbContext _context;
 
+        private ValidationResult ValidateOrder(Order order)
+        {
+            var result = new ValidationResult();
+
+            if (string.IsNullOrWhiteSpace(order.CustomerName))
+                result.ValidationItems.Add("Customer name is required.");
+
+            if (string.IsNullOrWhiteSpace(order.DeliveryAddress))
+                result.ValidationItems.Add("Delivery address is required.");
+
+            if (string.IsNullOrWhiteSpace(order.ContactNumber))
+                result.ValidationItems.Add("Contact number is required.");
+
+            if (order.Items == null || !order.Items.Any())
+                result.ValidationItems.Add("Order must have at least one item.");
+
+            foreach (var item in order.Items)
+            {
+                if (string.IsNullOrWhiteSpace(item.Name))
+                    result.ValidationItems.Add("Item name is required.");
+                if (item.Quantity <= 0)
+                    result.ValidationItems.Add($"Item '{item.Name}' must have quantity greater than 0.");
+                if (item.Price <= 0)
+                    result.ValidationItems.Add($"Item '{item.Name}' must have price greater than 0.");
+            }
+
+            return result;
+        }
+
         public OrderService(IApplicationDbContext context)
         {
             _context = context;
@@ -42,6 +71,11 @@ namespace AbySalto.Junior.Services
         public async Task<Result<Order>> CreateOrder(CreateOrderDTO dto)
         {
             var order = dto.ToModel();
+
+            var validationResult = ValidateOrder(order);
+            if (!validationResult.IsSuccess)
+                return Result<Order>.Failure(validationResult.ValidationItems);
+
             order.OrderTime = DateTime.UtcNow;
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
