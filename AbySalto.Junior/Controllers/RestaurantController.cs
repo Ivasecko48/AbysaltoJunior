@@ -1,6 +1,7 @@
 ﻿using AbySalto.Junior.Services.DTOs;
 using AbySalto.Junior.Models;
 using AbySalto.Junior.Services;
+using AbySalto.Junior.Controllers.Common;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AbySalto.Junior.Controllers
@@ -17,40 +18,45 @@ namespace AbySalto.Junior.Controllers
         }
         
         [HttpGet("orders")]
-        public async Task<IEnumerable<Order>> GetAllOrders()
+        public async Task<IActionResult> GetAllOrders()
         {
-            return await _orderService.GetAllOrders();
+            var result = await _orderService.GetAllOrders();
+            return this.HandleResult(result);
         }
 
         [HttpGet("orders/{id}")]
-        public async Task<Order?> GetOrderById(int id)
+        public async Task<IActionResult> GetOrderById(int id)
         {
-            return await _orderService.GetOrderById(id);
+            var result = await _orderService.GetOrderById(id);
+            return this.HandleResult(result);
         }
 
         [HttpPost("new")]
-        public async Task<int> CreateOrder([FromBody] CreateOrderDTO newOrder)
+        public async Task<IActionResult> CreateOrder([FromBody] CreateOrderDTO newOrder)
         {
-            var created = await _orderService.CreateOrder(newOrder);
-            return created.Id;
+            var result = await _orderService.CreateOrder(newOrder);
+            return this.HandleResult(result);
         }
 
         [HttpPut("orders/{id}/status")]
-        public async Task<bool> UpdateOrderStatus(int id, [FromBody] UpdateOrderStatusDTO dto)
+        public async Task<IActionResult> UpdateOrderStatus(int id, [FromBody] UpdateOrderStatusDTO dto)
         {
-            return await _orderService.UpdateOrderStatus(id, dto);
+            var result = await _orderService.UpdateOrderStatus(id, dto);
+            return this.HandleResult(result);
         }
 
         [HttpGet("orders/{id}/total")]
-        public async Task<decimal> GetOrderTotal(int id)
+        public async Task<IActionResult> GetOrderTotal(int id)
         {
-            return await _orderService.GetOrderTotal(id);
+            var result = await _orderService.GetOrderTotal(id);
+            return this.HandleResult(result);
         }
 
         [HttpGet("orders/sorted")]
-        public async Task<IEnumerable<Order>> GetAllOrdersSortedByTotal()
+        public async Task<IActionResult> GetAllOrdersSortedByTotal()
         {
-            return await _orderService.GetAllOrders(sortByTotal: true);
+            var result = await _orderService.GetAllOrders(sortByTotal: true);
+            return this.HandleResult(result);
         }
     }
 }

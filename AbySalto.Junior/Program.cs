@@ -1,6 +1,7 @@
 
 using AbySalto.Junior.Infrastructure.Database;
 using AbySalto.Junior.Services;
+using AbySalto.Junior.Controllers.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -46,6 +47,7 @@ namespace AbySalto.Junior
                 });
             }
 
+            app.UseMiddleware<ExceptionLoggingMiddleware>();
             app.UseHttpsRedirection();
             app.UseAuthorization();
 

@@ -1,14 +1,15 @@
-using AbySalto.Junior.Services.DTOs;
 using AbySalto.Junior.Models;
+using AbySalto.Junior.Services.Common;
+using AbySalto.Junior.Services.DTOs;
 
 namespace AbySalto.Junior.Services
 {
     public interface IOrderService
     {
-        Task<IEnumerable<Order>> GetAllOrders(bool sortByTotal = false);
-        Task<Order?> GetOrderById(int id);
-        Task<Order> CreateOrder(CreateOrderDTO dto);
-        Task<bool> UpdateOrderStatus(int id, UpdateOrderStatusDTO dto);
-        Task<decimal> GetOrderTotal(int id);
+        Task<Result<IEnumerable<Order>>> GetAllOrders(bool sortByTotal = false);
+        Task<Result<Order>> GetOrderById(int id);
+        Task<Result<Order>> CreateOrder(CreateOrderDTO dto);
+        Task<Result<bool>> UpdateOrderStatus(int id, UpdateOrderStatusDTO dto);
+        Task<Result<decimal>> GetOrderTotal(int id);
     }
 }
