@@ -19,6 +19,10 @@ namespace AbySalto.Junior.Services
             AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30)
         };
 
+        private static readonly JsonSerializerOptions JsonOptions = new()
+        {
+            ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
+        };
         public OrderService(IApplicationDbContext context, IDistributedCache cache)
         {
             _context = context;
@@ -46,9 +50,9 @@ namespace AbySalto.Junior.Services
                 if (string.IsNullOrWhiteSpace(item.Name))
                     result.ValidationItems.Add("Item name is required.");
                 if (item.Quantity <= 0)
-                    result.ValidationItems.Add($"Item '{item.Name}' must have quantity greater than 0.");
+                    result.ValidationItems.Add($"Item quantity '{item.Name}' must have quantity greater than 0.");
                 if (item.Price <= 0)
-                    result.ValidationItems.Add($"Item '{item.Name}' must have price greater than 0.");
+                    result.ValidationItems.Add($"Item price '{item.Name}' must have price greater than 0.");
             }
 
             return result;
@@ -61,7 +65,7 @@ namespace AbySalto.Junior.Services
              List<Order> orders;
             if (cached is not null)
             {
-                orders = JsonSerializer.Deserialize<List<Order>>(cached)!;
+                orders = JsonSerializer.Deserialize<List<Order>>(cached, JsonOptions)!;
             }
             else
             {
@@ -70,7 +74,7 @@ namespace AbySalto.Junior.Services
                     .ToListAsync();
 
                 await _cache.SetStringAsync(AllOrdersCacheKey,
-                    JsonSerializer.Serialize(orders), CacheOptions);
+                    JsonSerializer.Serialize(orders, JsonOptions), CacheOptions);
             }
 
             if (sortByTotal)
@@ -87,7 +91,7 @@ namespace AbySalto.Junior.Services
              Order? order;
             if (cached is not null)
             {
-                order = JsonSerializer.Deserialize<Order>(cached)!;
+                order = JsonSerializer.Deserialize<Order>(cached, JsonOptions)!;
             }
             else
             {
@@ -98,8 +102,8 @@ namespace AbySalto.Junior.Services
             if (order is null)
                 return Result<Order>.Failure(new List<string> { $"Order with id {id} not found." });
 
-            await _cache.SetStringAsync(cacheKey,
-                    JsonSerializer.Serialize(order), CacheOptions);
+            await _cache.SetStringAsync(AllOrdersCacheKey,
+                JsonSerializer.Serialize(order, JsonOptions), CacheOptions)!;
             }
 
             return Result<Order>.Success(order!);
